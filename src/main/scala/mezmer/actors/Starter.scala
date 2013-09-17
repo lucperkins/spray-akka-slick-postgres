@@ -16,13 +16,13 @@ object Starter {
 }
 
 class Starter extends Actor {
-	import Starter.Start
+  import Starter.Start
 
-	val config = ConfigFactory.load()
-	val (interface, port) = (
-		config.getString("app.interface"),
-		config.getInt("app.port")
-	)
+  val config = ConfigFactory.load()
+  val (mainInterface: String, mainPort: Int) = (
+    config.getString("app.interface"),
+    config.getInt("app.port")
+  )
 
   implicit val system = context.system
 
@@ -30,6 +30,6 @@ class Starter extends Actor {
     case Start =>
       val handler: ActorRef =
         context.actorOf(Props[Server].withRouter(RoundRobinRouter(nrOfInstances = 10)))
-      IO(Http) ! Http.Bind(handler, interface = "localhost", port = 3000)
+      IO(Http) ! Http.Bind(handler, interface = mainInterface, port = mainPort)
   }
 }
