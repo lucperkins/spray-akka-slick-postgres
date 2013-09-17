@@ -10,7 +10,7 @@ import MediaTypes._
 import spray.httpx.SprayJsonSupport._
 
 import mezmer.models.TweetDAO
-import WebService._
+import mezmer.server.WebService
 
 class Server extends Actor
   with UserService
