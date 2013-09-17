@@ -8,6 +8,7 @@ import HttpMethods._
 import MediaTypes._
 import akka.routing.RoundRobinRouter
 import com.typesafe.config.ConfigFactory
+import scala.util.Try
 
 import mezmer.server.Server
 
@@ -19,9 +20,9 @@ class Starter extends Actor {
   import Starter.Start
 
   val config = ConfigFactory.load()
-  val (mainInterface: String, mainPort: Int) = (
-    config.getString("app.interface"),
-    config.getInt("app.port")
+  lazy val (mainInterface: String, mainPort: Int) = (
+    Try(config.getString("app.interface")).getOrElse("localhost"),
+    Try(config.getInt("app.port")).getOrElse(9999)
   )
 
   implicit val system = context.system

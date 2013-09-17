@@ -1,16 +1,17 @@
 package mezmer.utils
 
-/*import com.amazonaws.services.s3.AmazonS3Client
+import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.auth.BasicAWSCredentials
 import java.io.File
 import com.typesafe.config.ConfigFactory
+import scala.util.Try
 
-object S3Support {
+trait S3Support {
   val s3Config = ConfigFactory.load()
-  val (bucket: String, awsAccessKey: String, awsSecretKey: String) = (
-    s3Config.getString("s3.bucket"),
-    s3Config.getString("aws.accessKey"),
-    s3Config.getString("aws.secretKey")
+  lazy val (bucket, awsAccessKey, awsSecretKey) = (
+    Try(s3Config.getString("s3.bucket")).getOrElse(System.getenv("S3_BUCKET")),
+    Try(s3Config.getString("aws.accessKey")).getOrElse(System.getenv("AWS_ACCESS_KEY")),
+    Try(s3Config.getString("aws.secretKey")).getOrElse(System.getenv("AWS_SECRET_KEY"))
   )
 
   val awsCredentials = new BasicAWSCredentials(awsAccessKey, awsSecretKey)
@@ -24,6 +25,4 @@ object S3Support {
     s3client.putObject(bucket, file.getName, file)
   }
 
-}*/
-
-// object S3Support extends S3Support
+}

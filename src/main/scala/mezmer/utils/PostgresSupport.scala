@@ -2,13 +2,14 @@ package mezmer.utils
 
 import slick.driver.PostgresDriver.simple._
 import com.typesafe.config.ConfigFactory
+import scala.util.Try
 
 trait PostgresSupport {
   val pgConfig = ConfigFactory.load()
-  val (pgHost, pgPort, pgDB) = (
-    pgConfig.getString("postgres.host"),
-    pgConfig.getInt("postgres.port"),
-    pgConfig.getString("postgres.dbname.1")
+  lazy val (pgHost, pgPort, pgDB) = (
+    Try(pgConfig.getString("postgres.host")).getOrElse("localhost"),
+    Try(pgConfig.getInt("postgres.port")).getOrElse(5432),
+    Try(pgConfig.getString("postgres.dbname")).getOrElse("localhost")
   )
 
   def db = Database.forURL(
