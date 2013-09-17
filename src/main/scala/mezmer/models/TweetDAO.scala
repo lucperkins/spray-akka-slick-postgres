@@ -24,7 +24,7 @@ case class Tweet(
 object TweetDAO extends PostgresSupport 
   // with RedisSupport
 {
-  import mezmer.models.TweetJsonProtocol._
+  import mezmer.data.TweetJsonProtocol._
 
   object TweetTable extends Table[Tweet]("tweets") {
     def tweetId      = column[Int]     ("tweetId", O.AutoInc, O.PrimaryKey, O.DBType("BIGINT"))

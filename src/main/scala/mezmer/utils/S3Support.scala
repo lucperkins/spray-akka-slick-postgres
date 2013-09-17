@@ -6,8 +6,8 @@ import java.io.File
 import com.typesafe.config.ConfigFactory
 
 object S3Support {
-	val s3Config = ConfigFactory.load()
-	val (bucket: String, awsAccessKey: String, awsSecretKey: String) = (
+  val s3Config = ConfigFactory.load()
+  val (bucket: String, awsAccessKey: String, awsSecretKey: String) = (
     s3Config.getString("s3.bucket"),
     s3Config.getString("aws.accessKey"),
     s3Config.getString("aws.secretKey")

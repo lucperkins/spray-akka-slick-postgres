@@ -4,7 +4,7 @@ import slick.driver.PostgresDriver.simple._
 import com.typesafe.config.ConfigFactory
 
 trait PostgresSupport {
-	val pgConfig = ConfigFactory.load()
+  val pgConfig = ConfigFactory.load()
   val (pgHost, pgPort, pgDB) = (
     pgConfig.getString("postgres.host"),
     pgConfig.getInt("postgres.port"),
