@@ -10,6 +10,7 @@ import MediaTypes._
 import spray.httpx.SprayJsonSupport._
 
 import mezmer.models.TweetDAO
+import WebService._
 
 class Server extends Actor
   with UserService
@@ -19,7 +20,7 @@ class Server extends Actor
   def receive = runRoute(restRoutes ~ userRoutes)
 }
 
-trait UserService extends HttpService {
+trait UserService extends WebService {
   val userRoutes = {
     path("users") {
       get {
@@ -29,9 +30,8 @@ trait UserService extends HttpService {
   }
 }
 
-trait TweetService extends HttpService {
+trait TweetService extends WebService {
   import mezmer.data.TweetJsonProtocol._
-  implicit val executionContext = actorRefFactory.dispatcher
 
   val restRoutes = {
     path("tweets") {

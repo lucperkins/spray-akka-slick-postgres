@@ -12,8 +12,8 @@ object TweetJsonProtocol extends DefaultJsonProtocol {
   val isoParser = ISODateTimeFormat.dateTimeParser()
   def dtParse(dt: String): DateTime = isoParser.parseDateTime(dt)
 
-	implicit object TweetJsonFormat extends RootJsonFormat[Tweet] {
-		def write(t: Tweet) = JsObject(
+  implicit object TweetJsonFormat extends RootJsonFormat[Tweet] {
+    def write(t: Tweet) = JsObject(
       "tweetId"      -> JsNumber(t.tweetId.toInt),
       "created"      -> JsString(t.created.toString()),
       "lastModified" -> JsString(t.lastModified.toString()),
@@ -47,5 +47,5 @@ object TweetJsonProtocol extends DefaultJsonProtocol {
         case _ => throw new DeserializationException("Tweet expected")
       }
     }
-	}
+  }
 }
