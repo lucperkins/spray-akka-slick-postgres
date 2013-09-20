@@ -5,33 +5,32 @@ import MediaTypes._
 import HttpCharsets._
 import spray.json._
 
-import mezmer.models.TweetDAO
-// import mezmer.data.TweetJsonProtocol._
+import mezmer.models.TaskDAO
 
-trait TweetService extends WebService {
-  val tweetServiceRoutes = {
+trait TaskService extends WebService {
+  val taskServiceRoutes = {
     path("count") {
       get {
-        val numberOfTweets: String = TweetDAO.numberOfTweets
+        val numberOfTasks: String = TaskDAO.numberOfTasks
         val res = HttpEntity(
           contentType = ContentType(`application/json`),
-          string = numberOfTweets
+          string = numberOfTasks
         )
         complete(res)
       }
     } ~
-    path("tweets") {
+    path("tasks") {
       get { ctx =>
-        val allTweets: String = TweetDAO.listAllTweets
+        val allTasks: String = TaskDAO.listAllTasks
         val res = HttpEntity(
           contentType = ContentType(`application/json`, `UTF-8`),
-          string = allTweets
+          string = allTasks
         )
         ctx.complete(res)
       } ~
         post {
-          formFields('content, 'username) { (content, username) =>
-            val pgResponse = TweetDAO.addTweet(content, username)
+          formFields('content, 'assignee) { (content, assignee) =>
+            val pgResponse = TaskDAO.addTask(content, assignee)
             val res = HttpEntity(
               contentType = ContentType(`text/plain`),
               string = pgResponse
@@ -40,17 +39,17 @@ trait TweetService extends WebService {
           }
         }
     } ~
-    pathPrefix("tweet" / IntNumber) { tweetId =>
+    pathPrefix("task" / IntNumber) { taskId =>
       get { ctx =>
-        val tweet: String = TweetDAO.fetchTweetById(tweetId)
+        val task: String = TaskDAO.fetchTaskById(taskId)
         val res = HttpEntity(
           contentType = ContentType(`application/json`, `UTF-8`),
-          string = tweet
+          string = task
         )
         ctx.complete(res)
       } ~
         delete { ctx =>
-          val pgResponse = TweetDAO.deleteTweetById(tweetId)
+          val pgResponse = TaskDAO.deleteTaskById(taskId)
           val res = HttpEntity(
             contentType = ContentType(`text/plain`),
             string = pgResponse
@@ -59,7 +58,7 @@ trait TweetService extends WebService {
         } ~
           put {
             formFields('content) { content =>
-              val pgResponse = TweetDAO.updateTweetById(tweetId, content)
+              val pgResponse = TaskDAO.updateTaskById(taskId, content)
               val res = HttpEntity(
                 contentType = ContentType(`text/plain`),
                 string = pgResponse
@@ -70,7 +69,7 @@ trait TweetService extends WebService {
     } ~
     path("api") {
       get {
-        complete("\n  HTTP methods:\n  =============\n\n  GET /count\n  GET /tweets\n  GET /tweet/:id\n  PUT /tweet/:id\n  DELETE /tweet/:id\n  POST /tweets\n\n\n")
+        complete("\n  HTTP methods:\n  =============\n\n  GET /count\n  GET /tasks\n  GET /task/:id\n  PUT /task/:id\n  DELETE /task/:id\n  POST /tasks\n\n\n")
       }
     }
   }
