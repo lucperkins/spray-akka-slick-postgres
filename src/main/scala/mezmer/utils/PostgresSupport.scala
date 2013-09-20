@@ -9,7 +9,7 @@ trait PostgresSupport {
   lazy val (pgHost, pgPort, pgDB) = (
     Try(pgConfig.getString("postgres.host")).getOrElse("localhost"),
     Try(pgConfig.getInt("postgres.port")).getOrElse(5432),
-    Try(pgConfig.getString("postgres.dbname")).getOrElse("localhost")
+    Try(pgConfig.getString("postgres.dbname")).getOrElse("postgres")
   )
 
   def db = Database.forURL(

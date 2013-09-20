@@ -15,7 +15,6 @@ import mezmer.utils.PostgresSupport
 case class Tweet(
   tweetId:      Int,
   created:      DateTime,
-  lastModified: DateTime,
   content:      String,
   retweeted:    Boolean,
   username:     String
@@ -29,25 +28,24 @@ object TweetDAO extends PostgresSupport
   object TweetTable extends Table[Tweet]("tweets") {
     def tweetId      = column[Int]     ("tweetId", O.AutoInc, O.PrimaryKey, O.DBType("BIGINT"))
     def created      = column[DateTime] ("created", O.DBType("TIMESTAMP"))
-    def lastModified = column[DateTime] ("lastmodified", O.DBType("TIMESTAMP"))
     def content      = column[String]   ("content", O.DBType("VARCHAR(140)"))
     def retweeted    = column[Boolean]  ("retweeted", O.DBType("BOOLEAN"))
-    def username     = column[String]   ("username", O.DBType("VARCHAR(12)"))
+    def username     = column[String]   ("username", O.DBType("VARCHAR(20)"))
 
-    def *            = (tweetId ~ created ~ lastModified ~ content ~ retweeted ~ username) <> (Tweet, Tweet.unapply _)
+    def *            = (tweetId ~ created ~ content ~ retweeted ~ username) <> (Tweet, Tweet.unapply _)
 
-    def forInsert    = (created ~ lastModified ~ content ~ retweeted ~ username) returning tweetId
+    def forInsert    = (created ~ content ~ retweeted ~ username) returning tweetId
   }
 
-  /*
-  implicit val dateTypeMapper = MappedTypeMapper.base[java.util.Date, java.sql.Date] (
-    { ud => new java.sql.Date(ud.getTime) },
-    { sd => new java.util.Date(sd.getTime) }
-  )
-  */
+  def listAllTweets: String =
+    Query(TweetTable).list.toJson.prettyPrint
 
-  def listAllTweets =
-    Query(TweetTable).list.toJson
+  // Convert count to JSON
+
+  case class Count(total: Int)
+  implicit val countJsonFormat = jsonFormat1(Count)
+
+  def numberOfTweets: String = Query(TweetTable).list.length.toJson.prettyPrint
 
   def createTable =
     TweetTable.ddl.create
@@ -55,25 +53,33 @@ object TweetDAO extends PostgresSupport
   def dropTable =
     TweetTable.ddl.drop
 
-  def addTweet(username: String, content: String) = {
+  def addTweet(username: String, content: String): String = {
     val now = new DateTime()
     val retweeted = false
-    TweetTable.forInsert.insert(now, now, content, retweeted, username) match {
+    TweetTable.forInsert.insert(now, content, retweeted, username) match {
       case 0 => "Something went wrong"
-      case n => s"Tweet number {n} added successfully"
+      case n => s"Tweet $n added successfully"
     }
   }
 
-  def fetchTweetById(id: Int) = {
-    Query(TweetTable).where(_.tweetId is id).list.toJson
-  }
+  def fetchTweetById(id: Int): String = 
+    Query(TweetTable).where(_.tweetId is id).list.toJson.prettyPrint
 
-  def deleteTweetById(id: Int) = {
+  def deleteTweetById(id: Int): String = {
     TweetTable.filter(_.tweetId === id).delete match {
-      case 0 => "0 tweets deleted"
-      case 1 => "1 tweet successfully deleted"
+      case 0 => s"Tweet $id was not found"
+      case 1 => s"Tweet $id successfully deleted"
       case _ => "Something went wrong"
     }
+  }
+
+  def updateTweetById(id: Int, newContent: String): String = {
+    TweetTable.where(_.tweetId is id).
+      map(t => t.content).
+      update(newContent) match {
+        case 1 => s"Tweet $id successfully modified"
+        case _ => s"Tweet $id was not found"
+      }
   }
 
   // Redis stuff

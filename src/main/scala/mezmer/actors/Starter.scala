@@ -3,21 +3,18 @@ package mezmer.actors
 import akka.actor._
 import akka.io.IO
 import spray.can.Http
-import spray.http._
-import HttpMethods._
-import MediaTypes._
 import akka.routing.RoundRobinRouter
 import com.typesafe.config.ConfigFactory
 import scala.util.Try
 
-import mezmer.server.Server
+import mezmer.server.ServerSupervisor
 
 object Starter {
   case object Start
 }
 
 class Starter extends Actor {
-  import Starter.Start
+  import Starter._
 
   val config = ConfigFactory.load()
   lazy val (mainInterface: String, mainPort: Int) = (
@@ -30,7 +27,7 @@ class Starter extends Actor {
   def receive: Receive = {
     case Start =>
       val handler: ActorRef =
-        context.actorOf(Props[Server].withRouter(RoundRobinRouter(nrOfInstances = 10)))
+        context.actorOf(Props[ServerSupervisor].withRouter(RoundRobinRouter(nrOfInstances = 10)))
       IO(Http) ! Http.Bind(handler, interface = mainInterface, port = mainPort)
   }
 }

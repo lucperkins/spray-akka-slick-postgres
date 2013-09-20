@@ -16,7 +16,6 @@ object TweetJsonProtocol extends DefaultJsonProtocol {
     def write(t: Tweet) = JsObject(
       "tweetId"      -> JsNumber(t.tweetId.toInt),
       "created"      -> JsString(t.created.toString()),
-      "lastModified" -> JsString(t.lastModified.toString()),
       "content"      -> JsString(t.content.toString),
       "retweeted"    -> JsBoolean(t.retweeted),
       "username"     -> JsString(t.username.toString)
@@ -24,7 +23,6 @@ object TweetJsonProtocol extends DefaultJsonProtocol {
     def read(j: JsValue) = {
       j.asJsObject.getFields("tweetId",
                              "created",
-                             "lastModified",
                              "content",
                              "retweeted",
                              "username"
@@ -32,14 +30,12 @@ object TweetJsonProtocol extends DefaultJsonProtocol {
         case Seq(
           JsNumber(tweetId),
           JsString(created),
-          JsString(lastModified),
           JsString(content),
           JsBoolean(retweeted),
           JsString(username)
         ) => new Tweet(
           tweetId.toInt,
           dtParse(created),
-          dtParse(lastModified),
           content,
           retweeted,
           username

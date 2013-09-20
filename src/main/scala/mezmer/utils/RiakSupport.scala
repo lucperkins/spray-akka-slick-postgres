@@ -2,7 +2,7 @@ package mezmer.utils
 
 /*
 // For error handling
-import scala.util.{ Success, Failure }
+import scala.util.{ Try, Success, Failure }
 
 // For dealing with futures
 import scala.concurrent._
@@ -21,14 +21,13 @@ object RiakSupport {
 	import nl.gideondk.raiku._
 
   val config = ConfigFactory.load()
-  val (riakHost, riakPort, riakWorkers) = (
-    config.getString("riak.host"),
-    config.getInt("riak.port"),
-    config.getInt("riak.workers")
+  val (riakHost, riakPort) = (
+    Try(config.getString("riak.host")).getOrElse("localhost"),
+    Try(config.getInt("riak.port")).getOrElse(8087)
   )
 
   implicit val raikuSystem = ActorSystem("raikuSystem")
-	val raikuClient = RaikuClient(riakHost, riakPort, riakWorkers)
+	val raikuClient = RaikuClient(riakHost, riakPort, 4)
 	
   implicit val userFormat = jsonFormat3(User)
 
@@ -41,44 +40,31 @@ object RiakSupport {
 
   val userBucket = RaikuBucket[User]("users", raikuClient)
 
-  def storeUser(u: User) = {
-    userBucket.store(u).start map {
-      case Success(v) => v.flatMap(_.value)
-      case Failure(e) => throw e
+  def fetchById(id: Int) = {
+    val f = userBucket.fetch(id.toString).start map {
+      case Success(raikuValue) => raikuValue.flatMap(_.value)
+      case Failure(error) => throw error
     }
   }
 
-  def fetchUserById(id: Int) = {
-    val fetchAttempt = userBucket.fetch(id.toString).start map {
-      case Success(v) => v.flatMap(_.value)
-      case Failure(e) => throw e
-    }
-    fetchAttempt.onSuccess {
-      case Some(v) => s"${v.id}"
-      case None    => "NONE"
+  def storeUser(u: User): String = {
+    (userBucket.store(u).start map {
+      case Success(raikuValue) => raikuValue.flatMap(_.value)
+      case Failure(error) => throw error
+    }).value match {
+      case Some(Success(u))    => Map("result" -> u).toJson.compactPrint
+      case Some(Failure(e))    => Map("result" -> e.getMessage).toJson.compactPrint
+      case None                => Map("result" -> "no user stored").toJson.compactPrint
     }
   }
 
-  /*
-  def fetchUserById(id: Int) = {
-    val idAsString = id.toString
-    val f: Future[User] = future {
-      userBucket ? idAsString
-    }
-    f.onComplete {
-      case Success(Some(u)) => u.value
-      case Success(None)    => "No user found with that ID"
-      case Failure(e)       => e.getMessage
-    }
-  }
-  */
-
-  def fetchUser(userId: Int) = {
-    val userIdAsString = userId.toString
-    (RiakSupport.userBucket ? userIdAsString).start.value match {
-      case Some(Success(user)) => user
-      case Some(Failure(_))    => "No user found for this ID"
-      case _                   => "Something went wrong"
+  def deleteById(id: Int) = {
+    (userBucket.deleteByKey(id.toString).start map {
+      case Success(_) => "success"
+      case Failure(e) => throw e 
+    }).value match {
+      case Some(_) => Map("result" -> "success").toJson.compactPrint
+      case None    => Map("result" -> "none deleted").toJson.compactPrint
     }
   }
 }*/

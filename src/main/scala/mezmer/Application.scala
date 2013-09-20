@@ -3,7 +3,7 @@ package mezmer
 import akka.actor.{ ActorSystem, Props }
 import mezmer.actors.Starter
 import mezmer.utils.PostgresSupport
-import mezmer.models.TweetDAO.TweetTable
+import mezmer.models.TweetDAO
 import slick.driver.PostgresDriver.simple._
 import scala.slick.jdbc.meta.MTable
 
@@ -12,9 +12,9 @@ object Application extends App
 {
   db.withSession {
     if (MTable.getTables("tweets").list.isEmpty) {
-      TweetTable.ddl.create
+      TweetDAO.createTable
     } else {
-
+      println("Postgres is ready")
     }
   }
 
