@@ -1,7 +1,5 @@
-spray-crud-example
+Spray CRUD Example
 ==================
-
-Spray CRUD example
 
 This is a basic REST web service that allows for CRUD operations on a `Task` data type. Yet another todo list app for the universe to admire!
 
