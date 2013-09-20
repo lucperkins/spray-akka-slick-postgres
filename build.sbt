@@ -21,6 +21,7 @@ libraryDependencies ++= Seq(
   "io.spray" % "spray-httpx" % "1.2-20130712",
   "io.spray" %% "spray-json" % "1.2.5",
   "com.typesafe.akka" %% "akka-actor" % "2.2.0",
+  "com.typesafe.akka" %% "akka-slf4j" % "2.2.0",
   "com.typesafe.slick" %% "slick" % "1.0.1",
   "com.h2database" % "h2" % "1.3.166",
   "postgresql" % "postgresql" % "9.1-901-1.jdbc4",
