@@ -70,7 +70,7 @@ trait TweetService extends WebService {
     } ~
     path("api") {
       get {
-        complete("\n  HTTP methods:\n  =============\n\n  GET /tweets\n  GET /tweet/:id\n  PUT /tweet/:id\n  DELETE /tweet/:id\n    POST /tweets\n\n\n")
+        complete("\n  HTTP methods:\n  =============\n\n  GET /count\n  GET /tweets\n  GET /tweet/:id\n  PUT /tweet/:id\n  DELETE /tweet/:id\n  POST /tweets\n\n\n")
       }
     }
   }

@@ -1,16 +1,13 @@
 package mezmer.models
 
-import spray.json._
-import DefaultJsonProtocol._
 import scala.slick.driver.PostgresDriver.simple._
-import com.github.tototoshi.slick.JodaSupport._
-import org.joda.time.DateTime
 import scala.slick.driver.PostgresDriver
-// import com.github.tminglei.slickpg._
-// import com.github.tototoshi.csv._
+import com.github.tototoshi.slick.JodaSupport._
+import spray.json._
+// import DefaultJsonProtocol._
+import org.joda.time.DateTime
 
 import mezmer.utils.PostgresSupport
-// import mezmer.utils.RedisSupport
 
 case class Tweet(
   tweetId:      Int,
@@ -20,9 +17,7 @@ case class Tweet(
   username:     String
 )
 
-object TweetDAO extends PostgresSupport 
-  // with RedisSupport
-{
+object TweetDAO extends PostgresSupport {
   import mezmer.data.TweetJsonProtocol._
 
   object TweetTable extends Table[Tweet]("tweets") {
@@ -81,15 +76,4 @@ object TweetDAO extends PostgresSupport
         case _ => s"Tweet $id was not found"
       }
   }
-
-  // Redis stuff
-  /*val R = RedisSupport
-
-  def storeTweetInRedis(id: Int) = {
-    R.redisClient(r).set("id", id)
-  }
-
-  def fetchFromRedisById(id: Int) = {
-    R.redisClient(r).get(id)
-  }*/
 }
