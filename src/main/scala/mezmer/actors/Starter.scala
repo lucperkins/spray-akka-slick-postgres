@@ -5,7 +5,6 @@ import akka.io.IO
 import spray.can.Http
 import akka.routing.RoundRobinRouter
 import com.typesafe.config.ConfigFactory
-import scala.util.Try
 
 import mezmer.server.ServerSupervisor
 
@@ -18,8 +17,8 @@ class Starter extends Actor {
 
   val config = ConfigFactory.load()
   lazy val (mainInterface: String, mainPort: Int) = (
-    Try(config.getString("app.interface")).getOrElse("localhost"),
-    Try(config.getInt("app.port")).getOrElse(9999)
+    config.getString("app.interface"),
+    config.getInt("app.port")
   )
 
   implicit val system = context.system

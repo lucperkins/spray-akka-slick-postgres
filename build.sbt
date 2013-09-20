@@ -16,6 +16,7 @@ resolvers ++= Seq(
 )
 
 libraryDependencies ++= Seq(
+  "io.spray" % "spray-can" % "1.2-20130712",
   "io.spray" % "spray-httpx" % "1.2-20130712",
   "io.spray" %% "spray-json" % "1.2.5",
   "io.spray" % "spray-routing" % "1.2-20130712",
