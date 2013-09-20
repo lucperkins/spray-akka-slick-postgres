@@ -3,14 +3,13 @@ package mezmer.server
 import spray.http._
 import MediaTypes._
 import HttpCharsets._
-import spray.httpx.SprayJsonSupport
 import spray.json._
 
 import mezmer.models.TweetDAO
-import mezmer.data.TweetJsonProtocol._
+// import mezmer.data.TweetJsonProtocol._
 
 trait TweetService extends WebService {
-  val restRoutes = {
+  val tweetServiceRoutes = {
     path("count") {
       get {
         val numberOfTweets: String = TweetDAO.numberOfTweets
