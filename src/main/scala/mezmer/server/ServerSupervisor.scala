@@ -1,11 +1,12 @@
 package mezmer.server
 
 import akka.actor._
-import spray.http._
-import HttpCharsets._
-import MediaTypes._
 
-class ServerSupervisor extends Actor with TaskService {
+class ServerSupervisor extends Actor
+	with TaskService
+	with S3Service
+	with PersonService
+{
   def actorRefFactory = context
-  def receive = runRoute(taskServiceRoutes)
+  def receive = runRoute(taskServiceRoutes ~ s3Routes ~ personRoutes)
 }

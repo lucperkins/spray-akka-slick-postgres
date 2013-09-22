@@ -1,0 +1,50 @@
+#!/bin/bash
+
+ROOT_DIR=$HOME/scala/mezmer/src/main/scala/mezmer
+
+case "$1" in
+new )
+	case $2 in
+	util ) echo "package mezmer.utils" >> $ROOT_DIR/utils/$3.scala
+	;;
+	model ) echo "package mezmer.models" >> $ROOT_DIR/models/$3.scala
+	;;
+	actor ) echo "package mezmer.actors" >> $ROOT_DIR/actors/$3.scala
+	;;
+	conf ) touch ./project/$3.conf
+	;;
+	service ) echo "package mezmer.server" >> $ROOT_DIR/server/$3Service.scala
+	;;
+	resource )
+		echo "package mezmer.models" >> $ROOT_DIR/models/$3.scala
+		echo "package mezmer.server" >> $ROOT_DIR/server/$3Service.scala
+	;;
+	* ) echo "Invalid command"
+	;;
+	esac
+	;;
+rm )
+	case $2 in
+	util ) rm $ROOT_DIR/utils/$3.scala
+	;;
+	model ) rm $ROOT_DIR/models/$3.scala
+	;;
+	actor ) rm $ROOT_DIR/actors/$3.scala
+	;;
+	conf ) rm ./project/$3.conf
+	;;
+	* ) echo "Invalid command"
+	;;
+	esac
+	;;
+go )
+	sbt update compile run ;;
+fresh )
+	sbt clean update
+	;;
+restart )
+	rm -rf target project/project project/target
+	;;
+* )
+	echo "Invalid command"
+esac

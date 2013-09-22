@@ -9,8 +9,7 @@ import mezmer.models.Task
 
 object TaskJsonProtocol extends DefaultJsonProtocol {
 
-  val isoParser = ISODateTimeFormat.dateTimeParser()
-  def dtParse(dt: String): DateTime = isoParser.parseDateTime(dt)
+  def dateTimeParse(dt: String): DateTime = ISODateTimeFormat.dateTimeParser().parseDateTime(dt)
 
   implicit object TaskJsonFormat extends RootJsonFormat[Task] {
     def write(t: Task) = JsObject(
@@ -20,10 +19,11 @@ object TaskJsonProtocol extends DefaultJsonProtocol {
       "finished"     -> JsBoolean(t.finished),
       "assignee"     -> JsString(t.assignee.toString)
     )
+    
     def read(j: JsValue) = {
       j.asJsObject.getFields("taskId", "content", "created", "finished", "assignee") match {
         case Seq(JsNumber(taskId), JsString(content), JsString(created), JsBoolean(finished), JsString(assignee)) =>
-          new Task(taskId.toInt, content, dtParse(created), finished, assignee)
+          new Task(taskId.toInt, content, dateTimeParse(created), finished, assignee)
         case _ => throw new DeserializationException("Improperly formed Task object")
       }
     }

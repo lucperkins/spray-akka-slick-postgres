@@ -1,10 +1,11 @@
 package mezmer.models
 
-import scala.slick.driver.PostgresDriver.simple._
 import scala.slick.driver.PostgresDriver
+import scala.slick.driver.PostgresDriver.simple._
 import com.github.tototoshi.slick.JodaSupport._
 import org.joda.time.DateTime
 import spray.json._
+import com.github.tototoshi.csv._
 
 import mezmer.utils.PostgresSupport
 
@@ -17,6 +18,7 @@ case class Task(
 )
 
 object TaskDAO extends PostgresSupport {
+  import CSVConverter._
   import mezmer.data.TaskJsonProtocol._
 
   object TaskTable extends Table[Task]("tasks") {
@@ -26,19 +28,27 @@ object TaskDAO extends PostgresSupport {
     def finished = column[Boolean] ("finished", O.DBType("BOOLEAN"), O.NotNull)
     def assignee = column[String]  ("assignee", O.DBType("VARCHAR(20)"), O.NotNull)
 
-    def *            = (taskId ~ content ~ created ~ finished ~ assignee) <> (Task, Task.unapply _)
+    def *         = (taskId ~ content ~ created ~ finished ~ assignee) <> (Task, Task.unapply _)
 
-    def forInsert    = (content ~ created ~ finished ~ assignee) returning taskId
+    def forInsert = (content ~ created ~ finished ~ assignee) returning taskId
   }
 
-  // Convert count to JSON
-  case class Count(total: Int)
-  implicit val countJsonFormat = jsonFormat1(Count)
+  def numberOfTasks: String = {
+    case class Count(numberOfTasks: Int)
+    implicit val countJsonFormat = jsonFormat1(Count)
+    val count: Int = Query(TaskTable).list.length
+    new Count(count).toJson.prettyPrint
+  }
+
+  def listAllIds: String = {
+    case class Ids(ids: List[Int])
+    implicit val idsJsonFormat = jsonFormat1(Ids)
+    val ids = Query(TaskTable).map(_.taskId).list
+    new Ids(ids).toJson.prettyPrint
+  }
 
   def listAllTasks: String =
     Query(TaskTable).list.toJson.prettyPrint
-
-  def numberOfTasks: String = Query(TaskTable).list.length.toJson.prettyPrint
 
   def createTable =
     TaskTable.ddl.create
@@ -73,5 +83,35 @@ object TaskDAO extends PostgresSupport {
         case 1 => s"Task $id successfully modified"
         case _ => s"Task $id was not found"
       }
+  }
+
+  def addMultipleTasks(args: List[(String, String)]) = {
+    args.map(arg => addTask(arg._1, arg._2)).map(result => println(result))
+  }
+
+  def populateTable(filename: String) = {
+    val csvInfo = CSVConverter.convert(filename)
+    addMultipleTasks(csvInfo)
+  }
+
+  def deleteAll = {
+    Query(TaskTable).delete match {
+      case 0 => "0 tasks deleted"
+      case 1 => "1 task deleted"
+      case n => s"$n tasks deleted"
+    }
+  }
+}
+
+object CSVConverter {
+  import java.io.File
+  import scala.collection.mutable.ListBuffer
+
+  def convert(filename: String) = {
+    val reader = CSVReader.open(new File(filename))
+    val rawList = reader.iterator.toList
+    val tweets = new ListBuffer[(String, String)]
+    rawList.foreach(line => tweets ++= List((line(0), line(1))))
+      tweets.toList
   }
 }

@@ -4,5 +4,5 @@ import akka.actor.{ ActorSystem, Props }
 import spray.routing.HttpService
 
 trait WebService extends HttpService {
-  implicit def executionContext = actorRefFactory.dispatcher
+  
 }

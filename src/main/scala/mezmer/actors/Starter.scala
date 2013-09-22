@@ -15,10 +15,10 @@ object Starter {
 class Starter extends Actor {
   import Starter._
 
-  val config = ConfigFactory.load()
+  val appConfig = ConfigFactory.load()
   lazy val (mainInterface: String, mainPort: Int) = (
-    config.getString("app.interface"),
-    config.getInt("app.port")
+    appConfig.getString("app.interface"),
+    appConfig.getInt("app.port")
   )
 
   implicit val system = context.system
