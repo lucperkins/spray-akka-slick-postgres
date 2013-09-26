@@ -1,6 +1,6 @@
 package mezmer
 
-import akka.actor.{ ActorSystem, Props }
+import akka.actor._
 import scala.slick.jdbc.meta.MTable
 import slick.driver.PostgresDriver.simple._
 
@@ -15,7 +15,7 @@ object Application extends App with PostgresSupport {
     println("Postgres is ready")
   }
 
-  val system = ActorSystem("mezmer")
+  val system = ActorSystem("main-system")
   val starter = system.actorOf(Props[Starter], name = "main")
   starter ! Starter.Start
 }

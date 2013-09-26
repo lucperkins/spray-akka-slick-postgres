@@ -4,9 +4,11 @@ import akka.actor._
 
 class ServerSupervisor extends Actor
 	with TaskService
-	with S3Service
-	with PersonService
+  with UserService
 {
   def actorRefFactory = context
-  def receive = runRoute(taskServiceRoutes ~ s3Routes ~ personRoutes)
+  def receive = runRoute(
+    taskServiceRoutes ~
+    userServiceRoutes
+  )
 }
