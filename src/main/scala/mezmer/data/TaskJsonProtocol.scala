@@ -8,7 +8,6 @@ import org.joda.time.format.ISODateTimeFormat
 import mezmer.models.Task
 
 object TaskJsonProtocol extends DefaultJsonProtocol {
-
   def dateTimeParse(dt: String): DateTime = ISODateTimeFormat.dateTimeParser().parseDateTime(dt)
 
   implicit object TaskJsonFormat extends RootJsonFormat[Task] {

@@ -25,8 +25,11 @@ class Starter extends Actor {
 
   def receive: Receive = {
     case Start =>
-      val handler: ActorRef =
+      val mainHandler: ActorRef =
         context.actorOf(Props[ServerSupervisor].withRouter(RoundRobinRouter(nrOfInstances = 10)))
-      IO(Http) ! Http.Bind(handler, interface = mainInterface, port = mainPort)
+      // val v1Handler: ActorRef =
+      //   context.actorOf(Props[V1Handler].withRouter(RoundRobinRouter(nrOfInstances = 10)))
+      // IO(Http) ! Http.Bind(v1Handler, interface = altInterface, port = secondaryPort)
+      IO(Http) ! Http.Bind(mainHandler, interface = mainInterface, port = mainPort)
   }
 }

@@ -19,7 +19,13 @@ trait UserService extends WebService {
       get { ctx =>
         val f = UserDAO.fetchUserById(userId)
         ctx.complete(f)
-      }
+      } /*~
+        put {
+          formFields('name.as[String]) { (name) =>
+            val f = UserDAO.modifyUserById(userId)
+            complete(f)
+          }
+        }*/
     } ~
     path("users") {
       post {

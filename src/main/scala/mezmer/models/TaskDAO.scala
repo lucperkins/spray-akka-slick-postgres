@@ -22,11 +22,11 @@ object TaskDAO extends PostgresSupport {
   import mezmer.data.TaskJsonProtocol._
 
   object TaskTable extends Table[Task]("tasks") {
-    def taskId   = column[Int]     ("taskId", O.AutoInc, O.PrimaryKey, O.DBType("BIGINT"))
-    def content  = column[String]  ("content", O.DBType("VARCHAR(50)"), O.NotNull)
-    def created  = column[DateTime]("created", O.DBType("TIMESTAMP"), O.NotNull)
-    def finished = column[Boolean] ("finished", O.DBType("BOOLEAN"), O.NotNull)
-    def assignee = column[String]  ("assignee", O.DBType("VARCHAR(20)"), O.NotNull)
+    def taskId    = column[Int]     ("taskId", O.AutoInc, O.PrimaryKey, O.DBType("BIGINT"))
+    def content   = column[String]  ("content", O.DBType("VARCHAR(50)"), O.NotNull)
+    def created   = column[DateTime]("created", O.DBType("TIMESTAMP"), O.NotNull)
+    def finished  = column[Boolean] ("finished", O.DBType("BOOLEAN"), O.NotNull)
+    def assignee  = column[String]  ("assignee", O.DBType("VARCHAR(20)"), O.NotNull)
 
     def *         = (taskId ~ content ~ created ~ finished ~ assignee) <> (Task, Task.unapply _)
 
@@ -112,6 +112,6 @@ object CSVConverter {
     val rawList = reader.iterator.toList
     val tweets = new ListBuffer[(String, String)]
     rawList.foreach(line => tweets ++= List((line(0), line(1))))
-      tweets.toList
+    tweets.toList
   }
 }
