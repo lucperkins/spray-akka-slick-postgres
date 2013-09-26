@@ -33,6 +33,15 @@ object TaskDAO extends PostgresSupport {
     def forInsert = (content ~ created ~ finished ~ assignee) returning taskId
   }
 
+  /*
+  
+  implicit val dateTypeMapper = MappedTypeMapper.base[Type1, Type2](
+    { t1 => t1.transform },
+    { t2 => t2.transform }
+  )
+
+  */
+
   def numberOfTasks: String = {
     case class Count(numberOfTasks: Int)
     implicit val countJsonFormat = jsonFormat1(Count)

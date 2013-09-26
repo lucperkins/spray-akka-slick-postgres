@@ -12,11 +12,11 @@ object TaskJsonProtocol extends DefaultJsonProtocol {
 
   implicit object TaskJsonFormat extends RootJsonFormat[Task] {
     def write(t: Task) = JsObject(
-      "taskId"       -> JsNumber(t.taskId.toInt),
-      "content"      -> JsString(t.content.toString()),
-      "created"      -> JsString(t.created.toString()),
-      "finished"     -> JsBoolean(t.finished),
-      "assignee"     -> JsString(t.assignee.toString)
+      "taskId"   -> JsNumber(t.taskId.toInt),
+      "content"  -> JsString(t.content.toString()),
+      "created"  -> JsString(t.created.toString()),
+      "finished" -> JsBoolean(t.finished),
+      "assignee" -> JsString(t.assignee.toString)
     )
     
     def read(j: JsValue) = {
