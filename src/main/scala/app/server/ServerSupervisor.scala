@@ -1,14 +1,14 @@
-package mezmer.server
+package app.server
 
 import akka.actor._
 
 class ServerSupervisor extends Actor
-	with TaskService
-  with UserService
+  with TaskService
 {
   def actorRefFactory = context
   def receive = runRoute(
-    taskServiceRoutes ~
-    userServiceRoutes
+    pathPrefix("api" / "v1") {
+      taskServiceRoutes
+    }
   )
 }

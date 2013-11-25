@@ -2,50 +2,26 @@ import sbt._
 import Keys._
 
 object BuildSettings {
-  val buildOrganization = "mezmer"
-  val buildVersion      = "0.1.0-SNAPSHOT"
+  val buildOrganization = "spray-akka-slick-postgres"
+  val buildVersion      = "0.1.0"
   val buildScalaVersion = "2.10.2"
 
   val buildSettings = Defaults.defaultSettings ++ Seq (
     organization := buildOrganization,
     version      := buildVersion,
-    scalaVersion := buildScalaVersion,
-    shellPrompt  := ShellPrompt.buildShellPrompt
+    scalaVersion := buildScalaVersion
   )
-}
-
-object ShellPrompt {
-  object devnull extends ProcessLogger {
-    def info (s: => String) {}
-    def error (s: => String) { }
-    def buffer[T] (f: => T): T = f
-  }
-  def currBranch = (
-    ("git status -sb" lines_! devnull headOption)
-      getOrElse "-" stripPrefix "## "
-  )
-
-  val buildShellPrompt = {
-    (state: State) => {
-      val currProject = Project.extract (state).currentProject.id
-      "%s:%s:%s> ".format (
-        currProject, currBranch, BuildSettings.buildVersion
-      )
-    }
-  }
 }
 
 object Resolvers {
   val sprayRepo       = "spray"                  at "http://repo.spray.io/"
   val sprayNightlies  = "Spray Nightlies"        at "http://nightlies.spray.io/"
   val sonatypeRel     = "Sonatype OSS Releases"  at "http://oss.sonatype.org/content/repositories/releases/"
-  val sonatypeSnap    = "Sonatype OSS Snapshots" at "http://oss.sonatype.org/content/repositories/snapshots/"
-  val raikuRepo       = "gideondk-repo"          at "https://raw.github.com/gideondk/gideondk-mvn-repo/master"  
+  val sonatypeSnap    = "Sonatype OSS Snapshots" at "http://oss.sonatype.org/content/repositories/snapshots/" 
 
   val sprayResolvers    = Seq(sprayRepo, sprayNightlies)
   val sonatypeResolvers = Seq(sonatypeRel, sonatypeSnap)
-  val otherResolvers    = Seq(raikuRepo)
-  val allResolvers      = sprayResolvers ++ sonatypeResolvers ++ otherResolvers
+  val allResolvers      = sprayResolvers ++ sonatypeResolvers
 }
 
 object Dependencies {
@@ -63,12 +39,9 @@ object Dependencies {
   val slickJoda    = "com.github.tototoshi" %% "slick-joda-mapper" % "0.3.0"
   val scalaCsv     = "com.github.tototoshi" %% "scala-csv"         % "1.0.0-SNAPSHOT"
   val logback      = "ch.qos.logback"       %  "logback-classic"   % "1.0.0"
-  val awsJavaSdk   = "com.amazonaws"        %  "aws-java-sdk"      % "1.0.002"
-  val redisClient  = "net.debasishg"        %% "redisclient"       % "2.10"
-  val raiku        = "nl.gideondk"          %% "raiku"             % "0.6.1"
 }
 
-object MezmerBuild extends Build {
+object AppBuild extends Build {
   import Resolvers._
   import Dependencies._
   import BuildSettings._
@@ -87,20 +60,15 @@ object MezmerBuild extends Build {
     postgres,
     slickJoda,
     scalaCsv,
-    logback,
-    awsJavaSdk,
-    redisClient,
-    raiku
+    logback
   )
 
   val allDeps = akkaDeps ++ sprayDeps ++ otherDeps
 
   lazy val mainProject = Project(
-    "mezmerMain",
+    "spray-akka-slick-postgres",
     file("."),
     settings = buildSettings ++ Seq(resolvers           ++= allResolvers,
                                     libraryDependencies ++= allDeps)
-  ) // aggregate
-    // dependsOn
-    
+  )
 }

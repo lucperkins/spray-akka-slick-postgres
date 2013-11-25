@@ -1,11 +1,11 @@
-package mezmer.data
+package app.data
 
 import spray.json._
 import DefaultJsonProtocol._
 import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
 
-import mezmer.models.Task
+import app.models.Task
 
 object TaskJsonProtocol extends DefaultJsonProtocol {
   def dateTimeParse(dt: String): DateTime = ISODateTimeFormat.dateTimeParser().parseDateTime(dt)

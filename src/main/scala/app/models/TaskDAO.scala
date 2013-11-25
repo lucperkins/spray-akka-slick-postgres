@@ -1,13 +1,14 @@
-package mezmer.models
+package app.models
 
 import scala.slick.driver.PostgresDriver
 import scala.slick.driver.PostgresDriver.simple._
 import com.github.tototoshi.slick.JodaSupport._
 import org.joda.time.DateTime
 import spray.json._
+import DefaultJsonProtocol._
 import com.github.tototoshi.csv._
 
-import mezmer.utils.PostgresSupport
+import app.utils.PostgresSupport
 
 case class Task(
   taskId:   Int,
@@ -19,7 +20,7 @@ case class Task(
 
 object TaskDAO extends PostgresSupport {
   import CSVConverter._
-  import mezmer.data.TaskJsonProtocol._
+  import app.data.TaskJsonProtocol._
 
   object TaskTable extends Table[Task]("tasks") {
     def taskId    = column[Int]     ("taskId", O.AutoInc, O.PrimaryKey, O.DBType("BIGINT"))
@@ -33,31 +34,26 @@ object TaskDAO extends PostgresSupport {
     def forInsert = (content ~ created ~ finished ~ assignee) returning taskId
   }
 
-  /*
-  
-  implicit val dateTypeMapper = MappedTypeMapper.base[Type1, Type2](
-    { t1 => t1.transform },
-    { t2 => t2.transform }
-  )
-
-  */
+  case class Count(numberOfTasks: Int)
+  case class Ids(ids: List[Int])
+  case class Result(result: String)
+  implicit val countJsonFormat = jsonFormat1(Count)
+  implicit val idsJsonFormat = jsonFormat1(Ids)
+  implicit val resultFormat = jsonFormat1(Result)
+  def pgResult(result: String) = new Result(result).toJson.compactPrint
 
   def numberOfTasks: String = {
-    case class Count(numberOfTasks: Int)
-    implicit val countJsonFormat = jsonFormat1(Count)
     val count: Int = Query(TaskTable).list.length
-    new Count(count).toJson.prettyPrint
+    new Count(count).toJson.compactPrint
   }
 
   def listAllIds: String = {
-    case class Ids(ids: List[Int])
-    implicit val idsJsonFormat = jsonFormat1(Ids)
     val ids = Query(TaskTable).map(_.taskId).list
-    new Ids(ids).toJson.prettyPrint
+    new Ids(ids).toJson.compactPrint
   }
 
   def listAllTasks: String =
-    Query(TaskTable).list.toJson.prettyPrint
+    Query(TaskTable).list.toJson.compactPrint
 
   def createTable =
     TaskTable.ddl.create
@@ -66,22 +62,20 @@ object TaskDAO extends PostgresSupport {
     TaskTable.ddl.drop
 
   def addTask(content: String, assignee: String): String = {
-    val now = new DateTime()
-    val finished = false
-    TaskTable.forInsert.insert(content, now, finished, assignee) match {
-      case 0 => "Something went wrong"
-      case n => s"Task $n added successfully"
+    TaskTable.forInsert.insert(content, new DateTime(), false, assignee) match {
+      case 0 => pgResult("Something went wrong")
+      case n => pgResult(s"Task $n added successfully")
     }
   }
 
   def fetchTaskById(id: Int): String = 
-    Query(TaskTable).where(_.taskId is id).list.toJson.prettyPrint
+    Query(TaskTable).where(_.taskId is id).list.toJson.compactPrint
 
   def deleteTaskById(id: Int): String = {
     TaskTable.filter(_.taskId === id).delete match {
-      case 0 => s"Task $id was not found"
-      case 1 => s"Task $id successfully deleted"
-      case _ => "Something went wrong"
+      case 0 => pgResult(s"Task $id was not found")
+      case 1 => pgResult(s"Task $id successfully deleted")
+      case _ => pgResult("Something went wrong")
     }
   }
 
@@ -89,8 +83,8 @@ object TaskDAO extends PostgresSupport {
     TaskTable.where(_.taskId is id).
       map(t => t.content).
       update(newContent) match {
-        case 1 => s"Task $id successfully modified"
-        case _ => s"Task $id was not found"
+        case 1 => pgResult(s"Task $id successfully modified")
+        case _ => pgResult(s"Task $id was not found")
       }
   }
 
@@ -105,9 +99,9 @@ object TaskDAO extends PostgresSupport {
 
   def deleteAll = {
     Query(TaskTable).delete match {
-      case 0 => "0 tasks deleted"
-      case 1 => "1 task deleted"
-      case n => s"$n tasks deleted"
+      case 0 => pgResult("0 tasks deleted")
+      case 1 => pgResult("1 task deleted")
+      case n => pgResult(s"$n tasks deleted")
     }
   }
 }

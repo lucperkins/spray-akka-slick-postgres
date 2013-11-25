@@ -1,4 +1,4 @@
-package mezmer.server
+package app.server
 
 import spray.http._
 import HttpCharsets._
