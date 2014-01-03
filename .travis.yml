@@ -1,5 +1,0 @@
-language: scala
-scala:
-  - "2.10.3"
-script:
-  - "sbt ++$TRAVIS_SCALA_VERSION compile"
