@@ -4,7 +4,7 @@ import Keys._
 object BuildSettings {
   val buildOrganization = "spray-akka-slick-postgres"
   val buildVersion      = "0.1.0"
-  val buildScalaVersion = "2.10.2"
+  val buildScalaVersion = "2.10.3"
 
   val buildSettings = Defaults.defaultSettings ++ Seq (
     organization := buildOrganization,
