@@ -11,6 +11,13 @@ object BuildSettings {
     version      := buildVersion,
     scalaVersion := buildScalaVersion
   )
+
+  scalacOptions ++= Seq(
+    "-unchecked",
+    "-deprecation",
+    "-feature",
+    "-encoding", "utf8"
+  )
 }
 
 object Resolvers {
