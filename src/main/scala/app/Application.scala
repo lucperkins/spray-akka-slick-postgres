@@ -9,6 +9,8 @@ import app.utils.PostgresSupport
 object Application extends App
   with PostgresSupport
 {
+  println("This is a test from prose.io")
+
   val system = ActorSystem("main-system")
   C.log.info("Actor system $system is up and running")
 
