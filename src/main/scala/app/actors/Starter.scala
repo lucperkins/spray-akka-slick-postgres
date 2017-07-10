@@ -3,25 +3,27 @@ package app.actors
 import akka.actor._
 import akka.io.IO
 import akka.routing.RoundRobinRouter
+import app.models.TaskDAO
 import spray.can.Http
-
-import app.{ Configs => C }
+import app.{Configs => C}
 import app.server.ServerSupervisor
 
 object Starter {
   case object Start
   case object Stop
+
+  def apply(taskDAO: TaskDAO) = Props(new Starter(taskDAO))
 }
 
-class Starter extends Actor {
-  import Starter.{ Start, Stop }
+final class Starter(taskDAO: TaskDAO) extends Actor {
+  import Starter.Start
 
-  implicit val system = context.system
+  private implicit val system = context.system
 
   def receive: Receive = {
     case Start =>
       val mainHandler: ActorRef =
-        context.actorOf(Props[ServerSupervisor].withRouter(RoundRobinRouter(nrOfInstances = 10)))
+        context.actorOf(ServerSupervisor.apply(taskDAO).withRouter(RoundRobinRouter(nrOfInstances = 10)))
       IO(Http) ! Http.Bind(mainHandler, interface = C.interface, port = C.appPort)
   }
 }

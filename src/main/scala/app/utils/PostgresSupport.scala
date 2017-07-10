@@ -1,10 +1,11 @@
 package app.utils
 
-import slick.driver.PostgresDriver.simple._
-import scala.slick.jdbc.meta.MTable
-
+import slick.driver.PostgresDriver.api._
+import slick.jdbc.meta.MTable
 import app.models.TaskDAO
-import app.{ Configs => C }
+import app.{Configs => C}
+
+import scala.concurrent.{ExecutionContext, Future}
 
 trait PostgresSupport {
   def db = Database.forURL(
@@ -14,9 +15,7 @@ trait PostgresSupport {
 
   implicit val session: Session = db.createSession()
 
-  def startPostgres() = {
-    if (MTable.getTables("tasks").list.isEmpty) {
-      TaskDAO.createTable
-    }
-  }
+  def startPostgres(taskDAO: TaskDAO)(implicit executionContext: ExecutionContext): Future[Unit] =
+    db.run(MTable.getTables("tasks")).map(v => if(v.isEmpty) taskDAO.createTable)
+
 }

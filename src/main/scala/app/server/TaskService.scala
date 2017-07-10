@@ -1,25 +1,22 @@
 package app.server
 
-import akka.actor._
-import akka.io.IO
 import akka.pattern.ask
-import scala.concurrent.ExecutionContext.Implicits.global
-import spray.http.{ HttpCharsets, MediaTypes }
-import spray.json._
-import spray.routing.Route._
 
+import scala.concurrent.ExecutionContext.Implicits.global
+import spray.json._
 import app.actors.PostgresActor
-import app.server.HTTPHelpers._
+import app.models.TaskDAO
+import spray.routing.Route
 
 trait TaskService extends WebService {
   import PostgresActor._
 
-  val postgresWorker = actorRefFactory.actorOf(Props[PostgresActor], "postgres-worker")
-  
-  def postgresCall(message: Any) =
+  def taskServiceRoutes(taskDAO: TaskDAO): Route = {
+    val postgresWorker = actorRefFactory.actorOf(PostgresActor.apply(taskDAO), "postgres-worker")
+
+    def postgresCall(message: Any) =
     (postgresWorker ? message).mapTo[String].map(result => result)
 
-  val taskServiceRoutes = {
     pathPrefix("tasks") {
       path("") {
         get { ctx =>
