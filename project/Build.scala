@@ -41,10 +41,12 @@ object Dependencies {
   val sprayHttpx   = "io.spray" %  "spray-httpx"   % sprayVersion
   val sprayRouting = "io.spray" %  "spray-routing" % sprayVersion
   val sprayJson    = "io.spray" %% "spray-json"    % "1.2.5"
-  val slick        = "com.typesafe.slick"   %% "slick"             % "1.0.1"
+  val jodaDateTime = "joda-time"            % "joda-time"          % "2.1"
+  val jodaConvert  = "org.joda"             % "joda-convert"       % "1.8.1"
+  val slick        = "com.typesafe.slick"   %% "slick"             % "3.0.0"
   val postgres     = "postgresql"           %  "postgresql"        % "9.1-901-1.jdbc4"
-  val slickJoda    = "com.github.tototoshi" %% "slick-joda-mapper" % "0.3.0"
-  val scalaCsv     = "com.github.tototoshi" %% "scala-csv"         % "1.0.0-SNAPSHOT"
+  val slickJoda    = "com.github.tototoshi" %% "slick-joda-mapper" % "2.0.0"
+  val scalaCsv     = "com.github.tototoshi" %% "scala-csv"         % "1.3.4"
   val logback      = "ch.qos.logback"       %  "logback-classic"   % "1.0.0"
 }
 
@@ -67,6 +69,8 @@ object AppBuild extends Build {
     postgres,
     slickJoda,
     scalaCsv,
+    jodaDateTime,
+    jodaConvert,
     logback
   )
 

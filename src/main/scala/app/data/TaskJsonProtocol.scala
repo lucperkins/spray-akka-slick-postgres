@@ -12,7 +12,7 @@ object TaskJsonProtocol extends DefaultJsonProtocol {
 
   implicit object TaskJsonFormat extends RootJsonFormat[Task] {
     def write(t: Task) = JsObject(
-      "taskId"   -> JsNumber(t.taskId.toInt),
+      "taskId"   -> JsNumber(t.taskId.getOrElse(0)),
       "content"  -> JsString(t.content.toString()),
       "created"  -> JsString(t.created.toString()),
       "finished" -> JsBoolean(t.finished),
@@ -22,7 +22,7 @@ object TaskJsonProtocol extends DefaultJsonProtocol {
     def read(j: JsValue) = {
       j.asJsObject.getFields("taskId", "content", "created", "finished", "assignee") match {
         case Seq(JsNumber(taskId), JsString(content), JsString(created), JsBoolean(finished), JsString(assignee)) =>
-          new Task(taskId.toInt, content, dateTimeParse(created), finished, assignee)
+          Task(Some(taskId.toInt), content, dateTimeParse(created), finished, assignee)
         case _ => throw new DeserializationException("Improperly formed Task object")
       }
     }

@@ -1,7 +1,7 @@
 package app.actors
 
-import akka.actor.Actor
-
+import akka.actor.{Actor, Props}
+import akka.pattern.pipe
 import app.models.TaskDAO
 
 object PostgresActor {
@@ -16,43 +16,46 @@ object PostgresActor {
   case object GetIds
   case object CreateTable
   case object DropTable
+
+  def apply(taskDAO: TaskDAO) = Props(new PostgresActor(taskDAO))
 }
 
-class PostgresActor extends Actor {
+final class PostgresActor(taskDAO: TaskDAO) extends Actor {
   import PostgresActor._
+  import context.dispatcher
 
   def receive: Receive = {
-    case FetchAll => 
-      sender ! TaskDAO.listAllTasks
-    
+    case FetchAll =>
+      taskDAO.listAllTasks.pipeTo(sender)
+
     case CreateTask(content: String, assignee: String) =>
-      sender ! TaskDAO.addTask(content, assignee)
-    
+      taskDAO.addTask(content, assignee).pipeTo(sender)
+
     case FetchTask(id: Int) =>
-      sender ! TaskDAO.fetchTaskById(id)
-    
+      taskDAO.fetchTaskById(id).pipeTo(sender)
+
     case ModifyTask(id: Int, content: String) =>
-      sender ! TaskDAO.updateTaskById(id, content)
-    
+      taskDAO.updateTaskById(id, content).pipeTo(sender)
+
     case DeleteTask(id: Int) =>
-      sender ! TaskDAO.deleteTaskById(id)
-    
+      taskDAO.deleteTaskById(id).pipeTo(sender)
+
     case DeleteAll =>
-      sender ! TaskDAO.deleteAll
-    
+      taskDAO.deleteAll.pipeTo(sender)
+
     case GetCount =>
-      sender ! TaskDAO.numberOfTasks
-    
-    case Populate(file: String) => 
-      sender ! TaskDAO.populateTable(file)
-    
+      taskDAO.numberOfTasks.pipeTo(sender)
+
+    case Populate(file: String) =>
+      taskDAO.populateTable(file).pipeTo(sender)
+
     case GetIds =>
-      sender ! TaskDAO.listAllIds
-    
+      taskDAO.listAllIds.pipeTo(sender)
+
     case CreateTable =>
-      sender ! TaskDAO.createTable
-    
+      taskDAO.createTable.pipeTo(sender)
+
     case DropTable =>
-      sender ! TaskDAO.dropTable
+      taskDAO.dropTable.pipeTo(sender)
   }
 }
